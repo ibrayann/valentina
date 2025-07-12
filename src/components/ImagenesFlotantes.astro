@@ -4,123 +4,175 @@ const imagenes = [
     id: 1,
     src: '/malla-1.png',
     alt: 'Imagen Motivacional 1',
-    position: 'top-4 left-4 rotate-[-3deg]',
-    size: 'w-32 h-32',
+    position: 'left-[2%] top-[10%]',
+    size: 'w-28 h-28',
+    zIndex: 'z-30',
   },
   {
     id: 2,
     src: '/malla-2.png',
     alt: 'Imagen Motivacional 2',
-    position: 'top-20 right-8 rotate-[5deg]',
-    size: 'w-36 h-36',
+    position: 'right-[2%] top-[15%]',
+    size: 'w-32 h-32',
+    zIndex: 'z-20',
   },
   {
     id: 3,
     src: '/malla-3.png',
     alt: 'Imagen Motivacional 3',
-    position: 'bottom-24 left-12 rotate-[-5deg]',
-    size: 'w-40 h-40',
+    position: 'left-[1%] bottom-[10%]',
+    size: 'w-36 h-36',
+    zIndex: 'z-40',
   },
   {
     id: 4,
     src: '/malla-4.png',
     alt: 'Imagen Motivacional 4',
-    position: 'bottom-16 right-16 rotate-[3deg]',
-    size: 'w-32 h-32',
+    position: 'right-[1%] bottom-[15%]',
+    size: 'w-30 h-30',
+    zIndex: 'z-30',
   },
   {
     id: 5,
     src: '/malla-5.png',
     alt: 'Imagen Motivacional 5',
-    position: 'top-1/2 -translate-y-1/2 right-4 rotate-[2deg]',
-    size: 'w-36 h-36',
+    position: 'right-[0%] top-[50%] -translate-y-1/2',
+    size: 'w-32 h-32',
+    zIndex: 'z-20',
   },
 ]
 ---
 
-<div class="relative w-full min-h-screen">
+<div class="fixed inset-0 pointer-events-none">
   {
     imagenes.map((imagen) => (
-      <button
-        class={`imagen-preview fixed ${imagen.position} bg-white rounded-lg shadow-lg p-2 hover:scale-105 transition-all duration-300 cursor-pointer transform hover:rotate-0 hover:z-50`}
-        data-imagen-id={imagen.id}
-      >
-        <img src={imagen.src} alt={imagen.alt} class={`${imagen.size} object-cover rounded-lg`} loading="lazy" />
-        <div class="absolute inset-0 bg-black opacity-0 hover:opacity-20 rounded-lg transition-opacity duration-300" />
-      </button>
+      <div class={`imagen-preview absolute ${imagen.position} ${imagen.zIndex} pointer-events-auto`} data-imagen-id={imagen.id}>
+        <button class="bg-white rounded-lg shadow-lg p-2 hover:scale-105 transition-all duration-300 cursor-pointer transform hover:rotate-0">
+          <img src={imagen.src} alt={imagen.alt} class={`${imagen.size} object-cover rounded-lg`} loading="lazy" />
+          <div class="absolute inset-0 bg-black opacity-0 hover:opacity-20 rounded-lg transition-opacity duration-300" />
+        </button>
+      </div>
     ))
   }
 </div>
 
 <!-- Modal para mostrar imagen completa -->
-<div id="modal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center z-[1000]">
-  <div class="max-w-[90vw] max-h-[90vh] relative">
-    <button id="cerrar-modal" class="absolute -top-10 right-0 text-white text-3xl hover:text-gray-300 transition-colors duration-200">&times;</button>
-    <img id="imagen-modal" src="" alt="" class="max-w-full max-h-[85vh] object-contain rounded-lg" />
+<div id="modal" class="fixed inset-0 bg-black/75 hidden items-center justify-center z-[1000] pointer-events-auto">
+  <div class="max-w-[90vw] max-h-[90vh] relative pointer-events-auto">
+    <button
+      id="cerrar-modal"
+      class="absolute -top-4 -right-4 w-12 h-12 flex items-center justify-center bg-red-500 hover:bg-red-600 rounded-full text-white text-2xl font-bold transition-all duration-200 cursor-pointer z-50 shadow-lg pointer-events-auto"
+    >
+      ✕
+    </button>
+    <div class="bg-white rounded-lg p-2 pointer-events-auto">
+      <img id="imagen-modal" src="" alt="" class="max-w-full max-h-[85vh] object-contain rounded-lg pointer-events-none" />
+    </div>
   </div>
 </div>
 
 <script>
-  // Función para abrir el modal
+  let modalAbierto = false
+
   function abrirModal(src: string, alt: string) {
     const modal = document.getElementById('modal')
     const imagenModal = document.getElementById('imagen-modal') as HTMLImageElement
 
-    if (modal && imagenModal) {
+    if (modal && imagenModal && !modalAbierto) {
+      modalAbierto = true
       imagenModal.src = src
       imagenModal.alt = alt
+      modal.style.display = 'flex'
       modal.classList.remove('hidden')
       document.body.style.overflow = 'hidden'
+      console.log('Modal abierto')
     }
   }
 
-  // Función para cerrar el modal
   function cerrarModal() {
     const modal = document.getElementById('modal')
-    if (modal) {
+    if (modal && modalAbierto) {
+      modalAbierto = false
+      modal.style.display = 'none'
       modal.classList.add('hidden')
       document.body.style.overflow = ''
+      console.log('Modal cerrado')
     }
   }
 
-  // Event listeners
   document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM cargado, configurando eventos...')
+
     // Añadir efecto de flotación aleatorio a las imágenes
     const previews = document.querySelectorAll('.imagen-preview')
-    previews.forEach((preview) => {
-      const randomDelay = Math.random() * 2 // Delay aleatorio entre 0 y 2 segundos
-      preview.setAttribute('style', `animation-delay: ${randomDelay}s`)
+    console.log('Previews encontrados:', previews.length)
+
+    previews.forEach((preview, index) => {
+      const randomDelay = Math.random() * 2
+      const randomDuration = 5 + Math.random() * 2
+      ;(preview as HTMLElement).style.setProperty('--float-delay', `${randomDelay}s`)
+      ;(preview as HTMLElement).style.setProperty('--float-duration', `${randomDuration}s`)
+
+      const button = preview.querySelector('button')
+      if (button) {
+        console.log(`Configurando botón ${index + 1}`)
+        button.addEventListener('click', () => {
+          const img = button.querySelector('img')
+          if (img) {
+            console.log('Abriendo modal con imagen:', img.src)
+            abrirModal(img.src, img.alt)
+          }
+        })
+      }
     })
 
-    // Click en las previsualizaciones
-    previews.forEach((preview) => {
-      preview.addEventListener('click', () => {
-        const img = preview.querySelector('img')
-        if (img) {
-          abrirModal(img.src, img.alt)
-        }
-      })
-    })
+    // Configurar el botón de cierre después de que el DOM esté listo
+    setTimeout(() => {
+      const cerrarBtn = document.getElementById('cerrar-modal')
+      if (cerrarBtn) {
+        console.log('Botón cerrar encontrado, agregando eventos...')
 
-    // Cerrar modal con el botón
-    const cerrarBtn = document.getElementById('cerrar-modal')
-    if (cerrarBtn) {
-      cerrarBtn.addEventListener('click', cerrarModal)
-    }
+        // Método principal: click
+        cerrarBtn.addEventListener('click', (e) => {
+          console.log('Botón X clickeado')
+          e.preventDefault()
+          e.stopPropagation()
+          cerrarModal()
+        })
+
+        // Método alternativo: mousedown
+        cerrarBtn.addEventListener('mousedown', (e) => {
+          console.log('Botón X mousedown')
+          e.preventDefault()
+          e.stopPropagation()
+          cerrarModal()
+        })
+
+        // Para dispositivos táctiles
+        cerrarBtn.addEventListener('touchend', (e) => {
+          console.log('Botón X touchend')
+          e.preventDefault()
+          e.stopPropagation()
+          cerrarModal()
+        })
+      } else {
+        console.error('Botón cerrar NO encontrado')
+      }
+    }, 100)
 
     // Cerrar modal al hacer click fuera de la imagen
-    const modal = document.getElementById('modal')
-    if (modal) {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          cerrarModal()
-        }
-      })
-    }
+    document.addEventListener('click', (e) => {
+      const modal = document.getElementById('modal')
+      if (modal && modalAbierto && e.target === modal) {
+        console.log('Click fuera del modal')
+        cerrarModal()
+      }
+    })
 
     // Cerrar modal con la tecla ESC
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && modalAbierto) {
+        console.log('Tecla ESC presionada')
         cerrarModal()
       }
     })
@@ -129,33 +181,38 @@ const imagenes = [
 
 <style>
   .imagen-preview {
-    animation: float 6s ease-in-out infinite;
-    transition: all 0.3s ease-in-out;
+    animation: float var(--float-duration, 6s) ease-in-out infinite;
+    animation-delay: var(--float-delay, 0s);
   }
 
-  .imagen-preview:hover {
+  .imagen-preview button {
+    transition: all 0.3s ease-in-out;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  }
+
+  .imagen-preview button:hover {
     transform: scale(1.1) rotate(0deg) !important;
     z-index: 50;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
   }
 
   @keyframes float {
-    0% {
-      transform: translateY(0px) rotate(var(--rotation));
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    25% {
+      transform: translate(10px, -15px) rotate(2deg);
     }
     50% {
-      transform: translateY(-10px) rotate(var(--rotation));
+      transform: translate(-5px, -25px) rotate(-1deg);
     }
-    100% {
-      transform: translateY(0px) rotate(var(--rotation));
+    75% {
+      transform: translate(-15px, -10px) rotate(1deg);
     }
   }
 
   #modal {
-    backdrop-filter: blur(5px);
-  }
-
-  #imagen-modal {
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
   }
 </style>
