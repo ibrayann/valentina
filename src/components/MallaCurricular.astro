@@ -1,0 +1,299 @@
+---
+
+---
+
+<div class="container mx-auto px-4 py-8">
+  <header class="text-center mb-8">
+    <h1 class="text-4xl font-bold text-blue-600 mb-2">Derecho UTAL Chile</h1>
+    <p class="text-gray-600">Malla Curricular Interactiva - Haz click en las asignaturas para marcarlas como completadas</p>
+    <div class="flex justify-center items-center space-x-6 text-sm text-gray-600">
+      <div class="flex items-center">
+        <div class="w-4 h-4 bg-green-200 border-2 border-green-400 rounded mr-2"></div>
+        <span>Completada (tachada)</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-4 h-4 bg-blue-200 border-2 border-blue-400 rounded mr-2"></div>
+        <span>Asignatura</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-4 h-4 bg-purple-200 border-2 border-purple-400 rounded mr-2"></div>
+        <span>Electivo</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-5 gap-4 mb-8" id="malla-container">
+    <!-- Los semestres se generarán dinámicamente -->
+  </div>
+
+  <div class="text-center space-y-4">
+    <button id="reset-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors duration-200"> Resetear Completadas </button>
+  </div>
+</div>
+
+<script>
+  interface Asignatura {
+    id: string
+    nombre: string
+    tipo: 'obligatoria' | 'electivo'
+  }
+
+  interface MallaCurricular {
+    [key: number]: Asignatura[]
+  }
+
+  // Datos de la malla curricular
+  const mallaInicial: MallaCurricular = {
+    1: [
+      { id: 'intro-derecho', nombre: 'Introducción al Análisis del Derecho', tipo: 'obligatoria' },
+      { id: 'derecho-politico-1', nombre: 'Derecho Político. Teoría del Estado y la Constitución', tipo: 'obligatoria' },
+      { id: 'derecho-literatura', nombre: 'Derecho y Literatura', tipo: 'obligatoria' },
+      { id: 'historia-derecho', nombre: 'Historia del Derecho', tipo: 'obligatoria' },
+      { id: 'intro-abogado', nombre: 'Introducción Práctica a las Funciones del Abogado', tipo: 'obligatoria' },
+      { id: 'comunicacion-1', nombre: 'Comunicación Oral y Escrita I', tipo: 'obligatoria' },
+    ],
+    2: [
+      { id: 'derecho-politico', nombre: 'Derecho Político. El fenómeno Político y los Tipos de Gobierno', tipo: 'obligatoria' },
+      { id: 'fundamentos-economia', nombre: 'Fundamentos de Teoría Económica', tipo: 'obligatoria' },
+      { id: 'historia-chile', nombre: 'Historia Política y Constitucional de Chile', tipo: 'obligatoria' },
+      { id: 'derecho-estado', nombre: 'Derecho del Estado y Jurisdicción Constitucional', tipo: 'obligatoria' },
+      { id: 'argumentacion', nombre: 'Argumentación Jurídica', tipo: 'obligatoria' },
+      { id: 'comunicacion-2', nombre: 'Comunicación Oral y Escrita II', tipo: 'obligatoria' },
+    ],
+    3: [
+      { id: 'derechos-fundamentales', nombre: 'Derecho de los Derechos Fundamentales y sus Garantías', tipo: 'obligatoria' },
+      { id: 'derecho-sociedad', nombre: 'Derecho y Sociedad', tipo: 'obligatoria' },
+      { id: 'derecho-economia', nombre: 'Derecho y Economía', tipo: 'obligatoria' },
+      { id: 'derecho-civil-general', nombre: 'Derecho Civil. Parte General y Personas', tipo: 'obligatoria' },
+      { id: 'derecho-procesal', nombre: 'Derecho Procesal Orgánico', tipo: 'obligatoria' },
+      { id: 'metodologia', nombre: 'Metodología Jurídica', tipo: 'obligatoria' },
+      { id: 'autogestion', nombre: 'Autogestión del Aprendizaje', tipo: 'obligatoria' },
+    ],
+    4: [
+      { id: 'internacional-publico', nombre: 'Derecho Internacional Público', tipo: 'obligatoria' },
+      { id: 'negocio-juridico', nombre: 'Teoría del Negocio Jurídico', tipo: 'obligatoria' },
+      { id: 'procesal-civil', nombre: 'Derecho Procesal Civil. Disposiciones Comunes y Juicio Ordinario', tipo: 'obligatoria' },
+      { id: 'solucion-controversias', nombre: 'Solución Alternativa de Controversias', tipo: 'obligatoria' },
+      { id: 'modulo-1', nombre: 'Módulo de Integración I', tipo: 'obligatoria' },
+      { id: 'trabajo-equipo', nombre: 'Trabajo en Equipo y Desarrollo de Habilidades Sociales', tipo: 'obligatoria' },
+    ],
+    5: [
+      { id: 'penal-general', nombre: 'Derecho Penal. Parte General', tipo: 'obligatoria' },
+      { id: 'administrativo', nombre: 'Derecho Administrativo', tipo: 'obligatoria' },
+      { id: 'trabajo', nombre: 'Derecho del Trabajo', tipo: 'obligatoria' },
+      { id: 'obligaciones', nombre: 'Derecho de las Obligaciones', tipo: 'obligatoria' },
+      { id: 'procesal-recursos', nombre: 'Derecho Procesal Civil. Recursos', tipo: 'obligatoria' },
+      { id: 'contextos-sociales', nombre: 'Comprensión de Contextos Sociales', tipo: 'obligatoria' },
+    ],
+    6: [
+      { id: 'derechos-reales', nombre: 'Derechos Reales', tipo: 'obligatoria' },
+      { id: 'contextos-culturales-1', nombre: 'Comprensión de Contextos Culturales I', tipo: 'obligatoria' },
+      { id: 'contextos-culturales-2', nombre: 'Comprensión de Contextos Culturales II', tipo: 'obligatoria' },
+      { id: 'modulo-2', nombre: 'Módulo de Integración II', tipo: 'obligatoria' },
+    ],
+    7: [
+      { id: 'penal-especial', nombre: 'Derecho Penal. Parte Especial', tipo: 'obligatoria' },
+      { id: 'comerciante', nombre: 'Derecho del Comerciante y Títulos Valores', tipo: 'obligatoria' },
+      { id: 'seguridad-social', nombre: 'Derecho de la Seguridad Social', tipo: 'obligatoria' },
+      { id: 'contratacion-civil', nombre: 'Contratación Civil', tipo: 'obligatoria' },
+      { id: 'procesal-penal', nombre: 'Derecho Procesal Penal', tipo: 'obligatoria' },
+      { id: 'litigacion-1', nombre: 'Taller de Litigación I', tipo: 'obligatoria' },
+      { id: 'etica', nombre: 'Ética y Responsabilidad Social', tipo: 'obligatoria' },
+    ],
+    8: [
+      { id: 'contratacion-mercantil', nombre: 'Contratación Mercantil', tipo: 'obligatoria' },
+      { id: 'electivo-1', nombre: 'Electivo I', tipo: 'electivo' },
+      { id: 'familia', nombre: 'Derecho de Familia', tipo: 'obligatoria' },
+      { id: 'litigacion-2', nombre: 'Taller de Litigación II', tipo: 'obligatoria' },
+      { id: 'responsabilidad-social', nombre: 'Responsabilidad Social', tipo: 'obligatoria' },
+      { id: 'modulo-3', nombre: 'Módulo de Integración III', tipo: 'obligatoria' },
+    ],
+    9: [
+      { id: 'clinica-juridica', nombre: 'Clínica Jurídica Formativa', tipo: 'obligatoria' },
+      { id: 'sociedades', nombre: 'Derecho de Sociedades', tipo: 'obligatoria' },
+      { id: 'filosofia', nombre: 'Filosofía del Derecho', tipo: 'obligatoria' },
+      { id: 'sucesorio', nombre: 'Derecho Sucesorio', tipo: 'obligatoria' },
+      { id: 'tributario-general', nombre: 'Derecho Tributario. Parte General', tipo: 'obligatoria' },
+    ],
+    10: [
+      { id: 'electivo-2', nombre: 'Electivo II', tipo: 'electivo' },
+      { id: 'concursal', nombre: 'Derecho Concursal', tipo: 'obligatoria' },
+      { id: 'internacional-privado', nombre: 'Derecho Internacional Privado', tipo: 'obligatoria' },
+      { id: 'danos', nombre: 'Derecho de Daños', tipo: 'obligatoria' },
+      { id: 'tributario-especial', nombre: 'Derecho Tributario. Parte Especial', tipo: 'obligatoria' },
+    ],
+  }
+
+  // Función para cargar estado de asignaturas completadas
+  function cargarEstadoCompletadas(): Record<string, boolean> {
+    const estadoGuardado = localStorage.getItem('asignaturasCompletadas')
+    if (estadoGuardado) {
+      return JSON.parse(estadoGuardado)
+    }
+    return {}
+  }
+
+  // Función para guardar estado de asignaturas completadas
+  function guardarEstadoCompletadas(estado: Record<string, boolean>): void {
+    localStorage.setItem('asignaturasCompletadas', JSON.stringify(estado))
+  }
+
+  // Función para toggle del estado de una asignatura
+  function toggleAsignatura(asignaturaId: string): void {
+    const estado = cargarEstadoCompletadas()
+    estado[asignaturaId] = !estado[asignaturaId]
+    guardarEstadoCompletadas(estado)
+
+    // Actualizar visualmente
+    const elemento = document.querySelector(`[data-asignatura-id="${asignaturaId}"]`)
+    if (elemento) {
+      actualizarEstiloAsignatura(elemento as HTMLElement, estado[asignaturaId])
+    }
+  }
+
+  // Función para actualizar estilo de asignatura
+  function actualizarEstiloAsignatura(elemento: HTMLElement, completada: boolean): void {
+    const asignaturaId = elemento.dataset.asignaturaId
+    const asignatura = obtenerAsignaturaPorId(asignaturaId || '')
+
+    if (completada) {
+      elemento.className = 'asignatura-item p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 bg-green-200 border-green-400 hover:bg-green-300'
+      elemento.innerHTML = `
+        <div class="text-sm font-medium text-center leading-tight flex items-center justify-center line-through">
+          <svg class="w-4 h-4 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+          </svg>
+          ${asignatura?.nombre || ''}
+        </div>
+      `
+    } else {
+      elemento.className = `asignatura-item p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${getColorAsignatura(asignatura?.tipo || 'obligatoria')}`
+      elemento.innerHTML = `
+        <div class="text-sm font-medium text-center leading-tight">
+          ${asignatura?.nombre || ''}
+        </div>
+      `
+    }
+  }
+
+  // Función para obtener asignatura por ID
+  function obtenerAsignaturaPorId(id: string): Asignatura | null {
+    const semestres = Object.values(mallaInicial)
+    for (const asignaturas of semestres) {
+      const asignatura = asignaturas.find((a: Asignatura) => a.id === id)
+      if (asignatura) return asignatura
+    }
+    return null
+  }
+
+  // Función para crear elemento de asignatura
+  function crearAsignatura(asignatura: Asignatura): HTMLElement {
+    const div = document.createElement('div')
+    div.className = `asignatura-item p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${getColorAsignatura(asignatura.tipo)}`
+    div.dataset.asignaturaId = asignatura.id
+    div.innerHTML = `
+      <div class="text-sm font-medium text-center leading-tight">
+        ${asignatura.nombre}
+      </div>
+    `
+
+    // Evento de click
+    div.addEventListener('click', () => {
+      toggleAsignatura(asignatura.id)
+    })
+
+    return div
+  }
+
+  // Función para obtener colores según tipo de asignatura
+  function getColorAsignatura(tipo: 'obligatoria' | 'electivo'): string {
+    switch (tipo) {
+      case 'obligatoria':
+        return 'bg-blue-200 border-blue-400 hover:bg-blue-300'
+      case 'electivo':
+        return 'bg-purple-200 border-purple-400 hover:bg-purple-300'
+      default:
+        return 'bg-blue-200 border-blue-400 hover:bg-blue-300'
+    }
+  }
+
+  // Función para crear semestre
+  function crearSemestre(numero: number, asignaturas: Asignatura[]): HTMLElement {
+    const div = document.createElement('div')
+    div.className = 'semestre-container bg-white rounded-lg shadow-md p-4 min-h-[400px] border-2 border-gray-200'
+
+    const header = document.createElement('div')
+    header.className = 'text-center mb-4'
+    header.innerHTML = `
+      <h2 class="text-lg font-bold text-pink-600 mb-2">${numero}° Semestre</h2>
+    `
+
+    const asignaturasContainer = document.createElement('div')
+    asignaturasContainer.className = 'space-y-2'
+
+    asignaturas.forEach((asignatura) => {
+      const asignaturaEl = crearAsignatura(asignatura)
+      asignaturasContainer.appendChild(asignaturaEl)
+
+      // Verificar si está completada y actualizar el estilo
+      const estadoCompletadas = cargarEstadoCompletadas()
+      if (estadoCompletadas[asignatura.id]) {
+        actualizarEstiloAsignatura(asignaturaEl, true)
+      }
+    })
+
+    div.appendChild(header)
+    div.appendChild(asignaturasContainer)
+
+    return div
+  }
+
+  // Función para renderizar la malla
+  function renderizarMalla() {
+    const container = document.getElementById('malla-container')
+    if (!container) return
+
+    container.innerHTML = ''
+
+    for (let i = 1; i <= 10; i++) {
+      // Cambiado para empezar desde el semestre 1
+      const asignaturas = mallaInicial[i] || []
+      const semestre = crearSemestre(i, asignaturas)
+      container.appendChild(semestre)
+    }
+  }
+
+  // Función para resetear asignaturas completadas
+  function resetearCompletadas() {
+    if (confirm('¿Estás seguro de que quieres resetear todas las asignaturas completadas?')) {
+      localStorage.removeItem('asignaturasCompletadas')
+      renderizarMalla()
+    }
+  }
+
+  // Inicializar cuando cargue la página
+  document.addEventListener('DOMContentLoaded', () => {
+    renderizarMalla()
+
+    // Agregar event listener al botón de reset
+    const resetBtn = document.getElementById('reset-btn')
+    if (resetBtn) {
+      resetBtn.addEventListener('click', resetearCompletadas)
+    }
+  })
+</script>
+
+<style>
+  .asignatura-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .semestre-container {
+    transition: all 0.3s ease;
+  }
+
+  .semestre-container:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+</style>

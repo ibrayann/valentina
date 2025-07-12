@@ -1,0 +1,161 @@
+---
+const imagenes = [
+  {
+    id: 1,
+    src: '/malla-1.png',
+    alt: 'Imagen Motivacional 1',
+    position: 'top-4 left-4 rotate-[-3deg]',
+    size: 'w-32 h-32',
+  },
+  {
+    id: 2,
+    src: '/malla-2.png',
+    alt: 'Imagen Motivacional 2',
+    position: 'top-20 right-8 rotate-[5deg]',
+    size: 'w-36 h-36',
+  },
+  {
+    id: 3,
+    src: '/malla-3.png',
+    alt: 'Imagen Motivacional 3',
+    position: 'bottom-24 left-12 rotate-[-5deg]',
+    size: 'w-40 h-40',
+  },
+  {
+    id: 4,
+    src: '/malla-4.png',
+    alt: 'Imagen Motivacional 4',
+    position: 'bottom-16 right-16 rotate-[3deg]',
+    size: 'w-32 h-32',
+  },
+  {
+    id: 5,
+    src: '/malla-5.png',
+    alt: 'Imagen Motivacional 5',
+    position: 'top-1/2 -translate-y-1/2 right-4 rotate-[2deg]',
+    size: 'w-36 h-36',
+  },
+]
+---
+
+<div class="relative w-full min-h-screen">
+  {
+    imagenes.map((imagen) => (
+      <button
+        class={`imagen-preview fixed ${imagen.position} bg-white rounded-lg shadow-lg p-2 hover:scale-105 transition-all duration-300 cursor-pointer transform hover:rotate-0 hover:z-50`}
+        data-imagen-id={imagen.id}
+      >
+        <img src={imagen.src} alt={imagen.alt} class={`${imagen.size} object-cover rounded-lg`} loading="lazy" />
+        <div class="absolute inset-0 bg-black opacity-0 hover:opacity-20 rounded-lg transition-opacity duration-300" />
+      </button>
+    ))
+  }
+</div>
+
+<!-- Modal para mostrar imagen completa -->
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center z-[1000]">
+  <div class="max-w-[90vw] max-h-[90vh] relative">
+    <button id="cerrar-modal" class="absolute -top-10 right-0 text-white text-3xl hover:text-gray-300 transition-colors duration-200">&times;</button>
+    <img id="imagen-modal" src="" alt="" class="max-w-full max-h-[85vh] object-contain rounded-lg" />
+  </div>
+</div>
+
+<script>
+  // Función para abrir el modal
+  function abrirModal(src: string, alt: string) {
+    const modal = document.getElementById('modal')
+    const imagenModal = document.getElementById('imagen-modal') as HTMLImageElement
+
+    if (modal && imagenModal) {
+      imagenModal.src = src
+      imagenModal.alt = alt
+      modal.classList.remove('hidden')
+      document.body.style.overflow = 'hidden'
+    }
+  }
+
+  // Función para cerrar el modal
+  function cerrarModal() {
+    const modal = document.getElementById('modal')
+    if (modal) {
+      modal.classList.add('hidden')
+      document.body.style.overflow = ''
+    }
+  }
+
+  // Event listeners
+  document.addEventListener('DOMContentLoaded', () => {
+    // Añadir efecto de flotación aleatorio a las imágenes
+    const previews = document.querySelectorAll('.imagen-preview')
+    previews.forEach((preview) => {
+      const randomDelay = Math.random() * 2 // Delay aleatorio entre 0 y 2 segundos
+      preview.setAttribute('style', `animation-delay: ${randomDelay}s`)
+    })
+
+    // Click en las previsualizaciones
+    previews.forEach((preview) => {
+      preview.addEventListener('click', () => {
+        const img = preview.querySelector('img')
+        if (img) {
+          abrirModal(img.src, img.alt)
+        }
+      })
+    })
+
+    // Cerrar modal con el botón
+    const cerrarBtn = document.getElementById('cerrar-modal')
+    if (cerrarBtn) {
+      cerrarBtn.addEventListener('click', cerrarModal)
+    }
+
+    // Cerrar modal al hacer click fuera de la imagen
+    const modal = document.getElementById('modal')
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          cerrarModal()
+        }
+      })
+    }
+
+    // Cerrar modal con la tecla ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        cerrarModal()
+      }
+    })
+  })
+</script>
+
+<style>
+  .imagen-preview {
+    animation: float 6s ease-in-out infinite;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .imagen-preview:hover {
+    transform: scale(1.1) rotate(0deg) !important;
+    z-index: 50;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px) rotate(var(--rotation));
+    }
+    50% {
+      transform: translateY(-10px) rotate(var(--rotation));
+    }
+    100% {
+      transform: translateY(0px) rotate(var(--rotation));
+    }
+  }
+
+  #modal {
+    backdrop-filter: blur(5px);
+  }
+
+  #imagen-modal {
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+  }
+</style>
